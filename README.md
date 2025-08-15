@@ -13,6 +13,7 @@ Image support has been implemented with [SkiaSharp](https://github.com/mono/Skia
 
 - [Documentation](docs/index.md)
 - [Example](#example)
+- [SkiaSharp Migration](#skiasharp-migration)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -44,6 +45,12 @@ gfx.DrawString("Hello World!", font, textColor, layout, format);
 
 document.Save("helloworld.pdf");
 ```
+
+## SkiaSharp Migration
+
+Earlier releases of PdfSharpCore relied on ImageSharp for raster image decoding and simple pixel manipulation before the data was embedded into a PDF. ImageSharp handled tasks such as loading PNG and JPEG files, converting them into bitmap structures, and preserving transparency information so that the drawing engine could consume them.
+
+The project now performs all image processing with SkiaSharp. The `SKBitmap` based implementation replaces the old ImageSharp pipelines while offering equivalent functionality and better cross-platform behavior. A key motivation for the migration was licensing: ImageSharp is distributed under the Six Labors Split License, which may require commercial licensing in some scenarios, whereas SkiaSharp is MIT licensed and therefore more permissive for open source and commercial use. Comprehensive tests ensure that SkiaSharp matches the previous behavior and provides a solid foundation for future development.
 
 ## Contributing
 
