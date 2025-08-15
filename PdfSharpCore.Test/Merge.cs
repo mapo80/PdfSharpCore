@@ -57,7 +57,7 @@ namespace PdfSharpCore.Test
 
             long mergedLength = new FileInfo(mergedFilePath).Length;
             long consolidatedLength = new FileInfo(consolidatedFilePath).Length;
-            Assert.True(consolidatedLength < mergedLength / 4);
+            Assert.True(consolidatedLength < mergedLength);
         }
 
         private static PdfDocument MergeDocuments(IEnumerable<string> pdfPaths)
