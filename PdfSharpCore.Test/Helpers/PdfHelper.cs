@@ -74,19 +74,18 @@ namespace PdfSharpCore.Test.Helpers
         //   For instance, actual and expected must both be sourced from .png files
         public static DiffOutput Diff(string actualImagePath, string expectedImagePath, string outputPath = null, string filePrefix = null, int fuzzPct = 4)
         {
-            var diffImg = new MagickImage();
             var actual = new MagickImage(actualImagePath);
             var expected = new MagickImage(expectedImagePath);
 
             // Allow for subtle differences due to cross-platform rendering of the PDF fonts
             actual.ColorFuzz = new Percentage(fuzzPct);
-            var diffVal = actual.Compare(expected, ErrorMetric.Absolute, diffImg);
-            
+            var diffImg = actual.Compare(expected, ErrorMetric.Absolute, Channels.All, out double diffVal);
+
             if (diffVal > 0 && outputPath != null && filePrefix != null)
             {
                 WriteImage(diffImg, outputPath, $"{filePrefix}_diff");
             }
-            
+
             return new DiffOutput
             {
                 DiffValue = diffVal,
