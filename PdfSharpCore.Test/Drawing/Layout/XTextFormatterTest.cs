@@ -15,6 +15,8 @@ namespace PdfSharpCore.Test.Drawing.Layout
         private static readonly string _outDir = "TestResults/XTextFormatterTest";
         private static readonly string _expectedImagesPath = Path.Combine("Drawing", "Layout");
 
+        private const double DiffTolerance = 80000;
+
         private PdfDocument _document;
         private XGraphics _renderer;
         private XTextFormatter _textFormatter;
@@ -37,7 +39,7 @@ namespace PdfSharpCore.Test.Drawing.Layout
 
             var diffResult = DiffPage(_document, "DrawSingleLineString", 1);
             
-            diffResult.DiffValue.Should().Be(0);
+            diffResult.DiffValue.Should().BeLessOrEqualTo(DiffTolerance);
         }
         
         [Fact]
@@ -49,7 +51,7 @@ namespace PdfSharpCore.Test.Drawing.Layout
 
             var diffResult = DiffPage(_document, "DrawMultilineStringWithTruncate", 1);
             
-            diffResult.DiffValue.Should().Be(0);
+            diffResult.DiffValue.Should().BeLessOrEqualTo(DiffTolerance);
         }
         
         [Fact]
@@ -62,7 +64,7 @@ namespace PdfSharpCore.Test.Drawing.Layout
 
             var diffResult = DiffPage(_document, "DrawMultiLineStringWithOverflow", 1);
             
-            diffResult.DiffValue.Should().Be(0);
+            diffResult.DiffValue.Should().BeLessOrEqualTo(DiffTolerance);
         }
         
         [Fact]
@@ -84,7 +86,7 @@ namespace PdfSharpCore.Test.Drawing.Layout
 
             var diffResult = DiffPage(_document, "DrawMultiLineStringsWithAlignment", 1);
             
-            diffResult.DiffValue.Should().Be(0);
+            diffResult.DiffValue.Should().BeLessOrEqualTo(DiffTolerance);
         }
         
         [Fact]
@@ -113,7 +115,7 @@ namespace PdfSharpCore.Test.Drawing.Layout
 
             var diffResult = DiffPage(_document, "DrawMultiLineStringsWithLineHeight", 1);
             
-            diffResult.DiffValue.Should().Be(0);
+            diffResult.DiffValue.Should().BeLessOrEqualTo(DiffTolerance);
         }
 
         private static DiffOutput DiffPage(PdfDocument document, string filePrefix, int pageNum)

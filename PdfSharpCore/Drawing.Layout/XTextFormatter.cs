@@ -143,7 +143,8 @@ namespace PdfSharpCore.Drawing.Layout
         {
             DrawString(text, font, brush, layoutRectangle, new TextFormatAlignment()
             {
-                Horizontal = XParagraphAlignment.Justify, Vertical = XVerticalAlignment.Top
+                Horizontal = Alignment,
+                Vertical = VerticalAlignment
             }, lineHeight);
         }
 
@@ -221,14 +222,21 @@ namespace PdfSharpCore.Drawing.Layout
             int count = _blocks.Count;
             foreach (var line in lines)
             {
-                var lineBlocks = line as Block[] ?? line.ToArray();
-                if (Alignment == XParagraphAlignment.Justify)
+                var lineBlocks = (line as IEnumerable<Block> ?? line)
+                    .Where(b => b.Type == BlockType.Text)
+                    .ToArray();
+
+                if (lineBlocks.Length == 0)
+                    continue;
+
+                if (Alignment == XParagraphAlignment.Justify && lineBlocks.Length > 1)
                 {
                     var locationX = dx;
-                    var gapSize = (layoutRectangle.Width - lineBlocks.Select(l => l.Width).Sum())/ (lineBlocks.Count() - 1);
+                    var gapSize = (layoutRectangle.Width - lineBlocks.Sum(l => l.Width)) / (lineBlocks.Length - 1);
                     foreach (var block in lineBlocks)
                     {
-                        _gfx.DrawString(block.Text.Trim(), font, brush, locationX, dy + lineBlocks.First().Location.Y, XStringFormats.TopLeft);
+                        _gfx.DrawString(block.Text.Trim(), font, brush, locationX,
+                            dy + lineBlocks[0].Location.Y, XStringFormats.TopLeft);
                         locationX += block.Width + gapSize;
                     }
                 }
@@ -240,7 +248,8 @@ namespace PdfSharpCore.Drawing.Layout
                         locationX = dx + layoutRectangle.Width / 2;
                     if (Alignment == XParagraphAlignment.Right)
                         locationX += layoutRectangle.Width;
-                    _gfx.DrawString(lineText, font, brush, locationX, dy + lineBlocks.First().Location.Y, GetXStringFormat());
+                    _gfx.DrawString(lineText, font, brush, locationX,
+                        dy + lineBlocks[0].Location.Y, GetXStringFormat());
                 }
             }
         }

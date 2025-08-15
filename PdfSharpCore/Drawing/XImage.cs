@@ -36,7 +36,6 @@ using MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes;
 using PdfSharpCore.Pdf.IO.enums;
 using static MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource;
 using PdfSharpCore.Utils;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace PdfSharpCore.Drawing
 {
@@ -79,7 +78,7 @@ namespace PdfSharpCore.Drawing
         // Useful stuff here: http://stackoverflow.com/questions/350027/setting-wpf-image-source-in-code
         XImage(string path)
         {
-            if (ImageSource.ImageSourceImpl == null) ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
+            if (ImageSource.ImageSourceImpl == null) ImageSource.ImageSourceImpl = new SkiaSharpImageSource();
             _source = ImageSource.FromFile(path);
             Initialize();
         }
@@ -95,8 +94,8 @@ namespace PdfSharpCore.Drawing
         {
             // Create a dummy unique path.
             _path = "*" + Guid.NewGuid().ToString("B");
-            if (ImageSource.ImageSourceImpl == null) 
-                ImageSource.ImageSourceImpl = new ImageSharpImageSource<Rgba32>();
+            if (ImageSource.ImageSourceImpl == null)
+                ImageSource.ImageSourceImpl = new SkiaSharpImageSource();
             _source = ImageSource.FromStream(_path, stream);
             Initialize();
         }
@@ -112,7 +111,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Creates an image from the specified file.
         /// For non-pdf files, this requires that an instance of an implementation of <see cref="T:MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource"/> be set on the `ImageSource.ImageSourceImpl` property.
-        /// For .NetCore apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.ImageSharpImageSource"/> with <see cref="T:SixLabors.ImageSharp.PixelFormats.Rgba32"/> Pixel Type is used
+        /// For .NET Core apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.SkiaSharpImageSource"/> is used.
         /// </summary>
         /// <param name="path">The path to a BMP, PNG, GIF, JPEG, TIFF, or PDF file.</param>
         public static XImage FromFile(string path)
@@ -123,7 +122,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Creates an image from the specified file.
         /// For non-pdf files, this requires that an instance of an implementation of <see cref="T:MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource"/> be set on the `ImageSource.ImageSourceImpl` property.
-        /// For .NetCore apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.ImageSharpImageSource"/> with <see cref="T:SixLabors.ImageSharp.PixelFormats.Rgba32"/> Pixel Type is used
+        /// For .NET Core apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.SkiaSharpImageSource"/> is used.
         /// </summary>
         /// <param name="path">The path to a BMP, PNG, GIF, JPEG, TIFF, or PDF file.</param>
         /// <param name="accuracy">Moderate allows for broken references when using a PDF file.</param>
@@ -137,7 +136,7 @@ namespace PdfSharpCore.Drawing
         /// <summary>
         /// Creates an image from the specified stream.<br/>
         /// For non-pdf files, this requires that an instance of an implementation of <see cref="T:MigraDocCore.DocumentObjectModel.MigraDoc.DocumentObjectModel.Shapes.ImageSource"/> be set on the `ImageSource.ImageSourceImpl` property.
-        /// For .NetCore apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.ImageSharpImageSource"/> with <see cref="T:SixLabors.ImageSharp.PixelFormats.Rgba32"/> Pixel Type is used
+        /// For .NET Core apps, if this property is null at this point, then <see cref="T:PdfSharpCore.Utils.SkiaSharpImageSource"/> is used.
         /// Silverlight supports PNG and JPEF only.
         /// </summary>
         /// <param name="stream">The stream containing a BMP, PNG, GIF, JPEG, TIFF, or PDF file.</param>

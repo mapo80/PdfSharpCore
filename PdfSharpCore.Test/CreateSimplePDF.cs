@@ -6,9 +6,7 @@ using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Test.Helpers;
 using PdfSharpCore.Utils;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using Xunit;
 
 namespace PdfSharpCore.Test
@@ -78,7 +76,7 @@ namespace PdfSharpCore.Test
         }
 
         [Fact]
-        public void CreateTestPdfWithImageViaImageSharp()
+        public void CreateTestPdfWithImageViaSkiaSharp()
         {
             using var stream = new MemoryStream();
             var document = new PdfDocument();
@@ -87,12 +85,26 @@ namespace PdfSharpCore.Test
 
             var renderer = XGraphics.FromPdfPage(pageNewRenderer);
 
-            // Load image for ImageSharp and apply a simple mutation:
-            var image = Image.Load<Rgb24>(PathHelper.GetInstance().GetAssetPath("lenna.png"), out var format);
-            image.Mutate(ctx => ctx.Grayscale());
+            // Load image with SkiaSharp and apply a simple grayscale filter:
+            var bitmap = SKBitmap.Decode(PathHelper.GetInstance().GetAssetPath("lenna.png"));
+            var grayInfo = new SKImageInfo(bitmap.Width, bitmap.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            var gray = new SKBitmap(grayInfo);
+            using (var canvas = new SKCanvas(gray))
+            using (var paint = new SKPaint())
+            {
+                paint.ColorFilter = SKColorFilter.CreateColorMatrix(new float[]
+                {
+                    0.2126f, 0.7152f, 0.0722f, 0, 0,
+                    0.2126f, 0.7152f, 0.0722f, 0, 0,
+                    0.2126f, 0.7152f, 0.0722f, 0, 0,
+                    0,       0,       0,       1, 0
+                });
+                canvas.DrawBitmap(bitmap, 0, 0, paint);
+            }
+            bitmap.Dispose();
 
-            // create XImage from that same ImageSharp image:
-            var source = ImageSharpImageSource<Rgb24>.FromImageSharpImage(image, format);
+            // create XImage from that same SkiaSharp bitmap:
+            var source = SkiaSharpImageSource.FromBitmap(gray);
             var img = XImage.FromImageSource(source);
 
             renderer.DrawImage(img, new XPoint(0, 0));
