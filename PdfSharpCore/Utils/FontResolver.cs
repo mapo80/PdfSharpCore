@@ -8,7 +8,7 @@ using PdfSharpCore.Internal;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Fonts;
 
-using SixLabors.Fonts;
+using SkiaSharp;
 
 
 namespace PdfSharpCore.Utils
@@ -76,38 +76,35 @@ namespace PdfSharpCore.Utils
 
         private readonly struct FontFileInfo
         {
-            private FontFileInfo(string path, FontDescription fontDescription)
+            private FontFileInfo(string path, string familyName, bool isBold, bool isItalic)
             {
                 this.Path = path;
-                this.FontDescription = fontDescription;
+                this.FamilyName = familyName;
+                this.IsBold = isBold;
+                this.IsItalic = isItalic;
             }
 
             public string Path { get; }
 
-            public FontDescription FontDescription { get; }
+            public string FamilyName { get; }
 
-            public string FamilyName => this.FontDescription.FontFamilyInvariantCulture;
+            public bool IsBold { get; }
+
+            public bool IsItalic { get; }
 
 
             public XFontStyle GuessFontStyle()
             {
-                switch (this.FontDescription.Style)
-                {
-                    case FontStyle.Bold:
-                        return XFontStyle.Bold;
-                    case FontStyle.Italic:
-                        return XFontStyle.Italic;
-                    case FontStyle.BoldItalic:
-                        return XFontStyle.BoldItalic;
-                    default:
-                        return XFontStyle.Regular;
-                }
+                if (IsBold && IsItalic) return XFontStyle.BoldItalic;
+                if (IsBold) return XFontStyle.Bold;
+                if (IsItalic) return XFontStyle.Italic;
+                return XFontStyle.Regular;
             }
 
             public static FontFileInfo Load(string path)
             {
-                FontDescription fontDescription = FontDescription.LoadDescription(path);
-                return new FontFileInfo(path, fontDescription);
+                using var typeface = SKTypeface.FromFile(path);
+                return new FontFileInfo(path, typeface.FamilyName, typeface.IsBold, typeface.IsItalic);
             }
         }
 
